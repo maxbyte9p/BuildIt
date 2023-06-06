@@ -22,7 +22,7 @@ mk -f $BUILDIT/stages.mk
 
 # To wipe the LFS system entirely
 ```
-mk -f $BUILDIT/stages.mk
+mk -f $BUILDIT/stages.mk clean
 ```
 
 # To build specific stages

@@ -1,0 +1,45 @@
+#!/bin/bash
+CHROOT=${CHROOT:=0}
+pkg="$1"
+
+function usage() {
+	echo "Usage: buildpkg pkg | CHROOT=1 buildpkg pkg"
+}
+
+if [ $# -gt 1 ] || [ $# -lt 1 ]; then
+	usage
+	exit 1
+fi
+
+if [ ! -f "$PKGS/$pkg.mk" ]; then
+	echo "Package does not exist!"
+	exit 1
+fi
+
+if [ "$CHROOT" != "1" ]; then
+	mk -f $PKGS/$pkg.mk
+elif [ "$CHROOT" == "1" ]; then
+	set -euo pipefail
+	(exec bwrap --bind $LFS / \
+	--bind $BUILDIT $BUILDIT \
+	--uid 0 \
+	--gid 0 \
+	--proc /proc \
+	--dev /dev  \
+	--tmpfs /run \
+	--chdir / \
+	--unshare-all \
+	--die-with-parent \
+	--clearenv \
+	--setenv HOME "/root" \
+	--setenv TERM "$TERM" \
+	--setenv PS1 "'(lfs chroot) \u:\w'" \
+	--setenv BUILDIT "$BUILDIT" \
+	--setenv LFS "$LFS" \
+	--setenv SOURCES "$SOURCES" \
+	--setenv BUILD "$BUILD" \
+	--setenv PKGS "$PKGS" \
+	--setenv MKTOOLS "$MKTOOLS" \
+	--setenv PATH "/usr/bin:/usr/sbin:$BUILDIT/bin:$MKTOOLS" \
+	/bin/bash -c "mk -f $PKGS/$pkg.mk")
+fi

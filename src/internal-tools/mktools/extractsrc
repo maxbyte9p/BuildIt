@@ -1,0 +1,24 @@
+#!/bin/bash
+src="$1"
+pkg="$2"
+
+function usage() {
+	echo "Usage: extractsrc src pkg"
+}
+
+if [ $# -gt 2 ] || [ $# -lt 2 ]; then
+	usage
+	exit 1
+fi
+
+if [ ! -d "$BUILD/$pkg" ]; then
+	echo "Package build directory does not exist!"
+	exit 1
+fi
+
+if [ ! -f "$SOURCES/$src" ]; then
+	echo "Source archive does not exist!"
+	exit 1
+fi
+
+tar -xf $SOURCES/$src  --no-same-owner --strip-components=1 -C $BUILD/$pkg

@@ -1,0 +1,19 @@
+#!/bin/bash
+pkg="$1"
+extra="${@:2:$#}"
+
+function usage() {
+	echo "Usage: installbuild pkg ..."
+}
+
+if [ $# -lt 1 ]; then
+	usage
+	exit 1
+fi
+
+if [ ! -d "$BUILD/$pkg" ]; then
+	echo "Package build directory does not exist!"
+	exit 1
+fi
+
+make $extra install -C $BUILD/$pkg

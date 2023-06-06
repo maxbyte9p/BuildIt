@@ -1,0 +1,2 @@
+#!/bin/bash
+wget -i $MKTOOLS/sources-list -P $SOURCES

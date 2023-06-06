@@ -1,0 +1,29 @@
+#!/bin/bash
+set -euo pipefail
+cmd="$@"
+CMD=${CMD:-$cmd}
+
+function usage() {
+	echo "Usage: runchroot ... | CMD=foo runchroot"
+}
+
+if [ ! -d "$LFS" ]; then
+	echo "No rootfs!"
+	exit 1
+fi
+
+(exec bwrap --bind $LFS / \
+	--uid 0 \
+	--gid 0 \
+	--proc /proc \
+	--dev /dev  \
+	--tmpfs /run \
+	--chdir / \
+	--unshare-all \
+	--die-with-parent \
+	--clearenv \
+	--setenv HOME "/root" \
+	--setenv TERM "$TERM" \
+	--setenv PS1 "'(lfs chroot) \u:\w'" \
+	--setenv PATH "/usr/bin:/usr/sbin" \
+	/bin/bash -l -c $CMD)

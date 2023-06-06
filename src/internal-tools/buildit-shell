@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+OPENSSLDIR=$(openssl version -d | cut -f 2 -d' ' | sed 's/\"//g')
+(exec ./bin/bwrap --ro-bind /usr /usr \
+      --ro-bind /bin /bin \
+      --ro-bind /sbin /sbin \
+      --ro-bind /lib  /lib \
+      --ro-bind /lib64 /lib64 \
+      --bind . /buildit \
+      --dir /tmp \
+      --dir /var \
+      --symlink ../tmp var/tmp \
+      --proc /proc \
+      --dev /dev \
+      --ro-bind /etc/resolv.conf /etc/resolv.conf \
+      --ro-bind $OPENSSLDIR $OPENSSLDIR \
+      --unshare-all \
+      --share-net \
+      --die-with-parent \
+      --dir /run/user/$(id -u) \
+      --dir $HOME \
+      --clearenv \
+      --setenv XDG_RUNTIME_DIR "/run/user/`id -u`" \
+      --setenv PS1 "bwrap-demo$ " \
+      --setenv TERM "$TERM" \
+      --setenv HOME "$HOME" \
+      --file 11 /etc/passwd \
+      --file 12 /etc/group \
+      /bin/bash --rcfile /buildit/bash/bashrc) \
+    11< <(getent passwd $UID 65534) \
+    12< <(getent group $(id -g) 65534)

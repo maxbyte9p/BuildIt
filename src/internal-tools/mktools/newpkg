@@ -1,0 +1,51 @@
+#!/bin/bash
+pkg=$1
+src=$2
+
+function usage() {
+	echo "Usage: newpkg pkg src"
+}
+
+if [ $# -gt 2 ] || [ $# -lt 2 ]; then
+	usage
+	exit 1
+fi
+
+tvars="
+pkg=$pkg
+src=$src
+"
+
+template='
+def:V: install
+
+mkdirs:V:
+	prepbuild $pkg
+
+extract:V: mkdirs
+	extractsrc $src $pkg
+
+configure:V: extract
+	cd $BUILD/$pkg
+
+build:V: configure
+	buildsrc $pkg -j$(nproc)
+
+install:V: build
+	installbuild $pkg
+'
+
+pkgscript="
+$tvars
+$template
+"
+
+echo "$pkgscript" > $PKGS/$pkg.mk
+cat << EOF
+New pkg $pkg created.
+The line below can be right clicked in acme to open the file.
+$PKGS/$pkg.mk
+EOF
+
+
+

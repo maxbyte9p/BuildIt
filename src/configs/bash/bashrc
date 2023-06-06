@@ -1,0 +1,24 @@
+set +h
+umask 022
+
+HOME=$HOME
+TERM=$TERM
+PS1='\u:\w$ '
+
+BUILDIT=/buildit
+LFS=/buildit/LFS
+LC_ALL=POSIX
+LFS_TGT=$(uname -m)-lfs-linux-gnu
+SOURCES=$LFS/sources
+BUILD=$LFS/build
+PKGS=$BUILDIT/pkgs
+MKTOOLS=/buildit/mktools
+
+PATH=/usr/bin
+if [ ! -L /bin ]; then PATH=/bin:$PATH; fi
+PATH=$LFS/tools/bin:$PATH
+PATH=$BUILDIT/bin:$MKTOOLS:$PATH
+
+CONFIG_SITE=$LFS/usr/share/config.site
+
+export BUILDIT LFS LC_ALL LFS_TGT SOURCES BUILD PKGS MKTOOLS PATH CONFIG_SITE

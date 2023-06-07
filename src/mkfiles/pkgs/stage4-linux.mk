@@ -15,8 +15,7 @@ extract:V: mkdirs
 configure:V: extract
 	cd $BUILD/$pkg
 	make mrproper
-	make menuconfig
-#	make defconfig
+	make defconfig
 
 build:V: configure
 	buildsrc $pkg -j$(nproc)
